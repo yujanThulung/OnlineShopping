@@ -27,3 +27,7 @@ body {
 .navbar-nav{
     background-color:aliceblue;
 }
+
+.product-box {
+    border: 1px solid #4cff00;
+}
