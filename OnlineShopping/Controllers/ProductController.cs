@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OnlineShopping.Data;
 using OnlineShopping.Models;
 
@@ -27,10 +29,18 @@ namespace OnlineShopping.Controllers
         }
 
 
-        public async Task<IActionResult> ProductDashboard()
+        public async Task<IActionResult> ProductDashboard(string? pTitle)
         {
-            var onlineShoppingContext = _context.Product.Include(p => p.Category);
-            return View(await onlineShoppingContext.ToListAsync());
+            if (!string.IsNullOrEmpty(pTitle))
+            {
+                var searchResult = from p in _context.Product where p.Title.Contains(pTitle) select p;
+                return View(await searchResult.ToListAsync());
+            }
+            else
+            {
+                var onlineShoppingContext = _context.Product.Include(p => p.Category);
+                return View(await onlineShoppingContext.ToListAsync());
+            }
         }
 
 
@@ -65,13 +75,14 @@ namespace OnlineShopping.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Photo,Price,Description,CategoryId")] Product product,IFormFile PhotoIcon)
+        public async Task<IActionResult> Create([Bind("Id,Title,Photo,Price,Description,CategoryId")] Product product, IFormFile PhotoIcon)
         {
             if (ModelState.IsValid)
             {
                 string path = Environment.CurrentDirectory + "/wwwroot/ProductImages/";
                 string file;
-                if(!string.IsNullOrEmpty(PhotoIcon.FileName)){
+                if (!string.IsNullOrEmpty(PhotoIcon.FileName))
+                {
                     file = path + PhotoIcon.FileName;
                     FileStream fs = new FileStream(file, FileMode.Create);
                     await PhotoIcon.CopyToAsync(fs);

@@ -5,6 +5,12 @@
 }
 
 <h1>Product Dashboards</h1>
+
+
+<form asp-action = "ProductDashboard">
+    <input type="text" name="pTitle"/>
+    <input type="submit" name="Search" value="Search" />
+</form>
 <table class="table">
     <tr>
         @foreach (var item in Model)
